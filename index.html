@@ -2,14 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Message Task with OTP Autofill</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #1e140d;
       color: white;
     }
+
     .top-bar {
       background: #333;
       padding: 10px;
@@ -17,43 +23,66 @@
       display: flex;
       flex-direction: column;
     }
+
     .path {
       font-size: 10px;
       color: gray;
     }
+
     .container {
       padding: 16px;
     }
+
     h1 {
       text-align: center;
       margin-bottom: 20px;
+      font-size: 24px;
     }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
     .stats-box {
       display: flex;
-      justify-content: space-around;
+      flex-wrap: wrap;
+      justify-content: space-between;
       background-color: #3a281c;
       padding: 15px;
       border-radius: 12px;
       margin-bottom: 20px;
       text-align: center;
+      gap: 10px;
     }
+
+    .stats-box > div {
+      flex: 1 1 30%;
+      min-width: 100px;
+    }
+
     .stats-box small {
       display: block;
       color: #aaa;
       font-size: 12px;
     }
+
     .whatsapp-box {
       background-color: #2d1d13;
       padding: 20px;
       border-radius: 12px;
       margin-bottom: 20px;
     }
+
     .phone-input {
       display: flex;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
+
     .phone-input input {
       flex: 1;
+      min-width: 60%;
       padding: 10px;
       border-radius: 8px 0 0 8px;
       border: none;
@@ -61,6 +90,7 @@
       background-color: #444;
       color: white;
     }
+
     .phone-input button {
       padding: 10px 15px;
       background-color: orange;
@@ -69,15 +99,21 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
+      flex-shrink: 0;
     }
+
     .otp-box {
       display: flex;
       justify-content: space-between;
       margin-top: 15px;
+      gap: 6px;
     }
+
     .otp-box input {
-      width: 40px;
-      height: 40px;
+      flex: 1;
+      min-width: 40px;
+      max-width: 50px;
+      height: 45px;
       text-align: center;
       font-size: 18px;
       border-radius: 8px;
@@ -85,11 +121,13 @@
       border: none;
       color: white;
     }
+
     .note {
       margin-top: 10px;
       font-size: 12px;
       color: #aaa;
     }
+
     .added-numbers {
       background-color: #1a110a;
       padding: 15px;
@@ -97,13 +135,17 @@
       max-height: 300px;
       overflow-y: auto;
     }
+
     .number-entry {
       border-bottom: 1px solid #444;
       padding: 10px 0;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
     }
+
     .number-entry code {
       background-color: #333;
       padding: 2px 6px;
@@ -111,6 +153,7 @@
       font-weight: bold;
       letter-spacing: 1.5px;
     }
+
     .delete-btn {
       background-color: #e04e4e;
       border: none;
@@ -120,11 +163,51 @@
       cursor: pointer;
       font-weight: bold;
       font-size: 12px;
-      margin-left: 15px;
       user-select: none;
     }
+
     .delete-btn:hover {
       background-color: #b93636;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 20px;
+      }
+
+      .phone-input input {
+        border-radius: 8px 8px 0 0;
+        margin-bottom: 6px;
+        min-width: 100%;
+      }
+
+      .phone-input button {
+        border-radius: 0 0 8px 8px;
+        min-width: 100%;
+      }
+
+      .otp-box {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .otp-box input {
+        margin: 3px 2px;
+      }
+
+      .stats-box {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .stats-box > div {
+        width: 100%;
+      }
+
+      .number-entry {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -265,9 +348,7 @@
       todayPointsEl.innerHTML = `${todayPoints}<br><small>Today Points</small>`;
       yesterdayPointsEl.innerHTML = `${yesterdayPoints}<br><small>Yesterday Points</small>`;
 
-      // Attach delete button event listeners
-      const deleteButtons = document.querySelectorAll('.delete-btn');
-      deleteButtons.forEach(btn => {
+      document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const idx = parseInt(e.target.getAttribute('data-index'));
           if (!isNaN(idx)) {
@@ -285,6 +366,7 @@
         alert('Please enter a phone number');
         return;
       }
+
       const popPopCode = generatePopPopCode();
 
       addedNumbers.push({ number, addedAt: new Date().toISOString(), code: popPopCode });
@@ -293,7 +375,6 @@
       phoneInput.value = '';
       renderAddedNumbers();
 
-      // Autofill OTP inputs
       const otpInputs = document.querySelectorAll('.otp-box input');
       for (let i = 0; i < otpInputs.length; i++) {
         otpInputs[i].value = popPopCode[i] || '';
@@ -305,7 +386,7 @@
     setInterval(() => {
       renderAddedNumbers();
       localStorage.setItem('addedNumbers', JSON.stringify(addedNumbers));
-    }, 60 * 1000);
+    }, 60000);
   </script>
 </body>
 </html>
